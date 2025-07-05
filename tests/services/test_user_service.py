@@ -35,3 +35,19 @@ async def test_get_users_count_called_with_correct_params():
             # Asserting that the get method was called with the correct URL and parameters
             mock_get.assert_called_once_with("https://dummyjson.com/users", params={"limit": 1})
             assert result == 50
+
+# Test cases for get_users_count function when the response does not contain the "total" key
+@pytest.mark.asyncio
+async def test_get_users_count_no_total_key():
+    with patch("src.services.user_service.get_cache", return_value=None), patch("src.services.user_service.set_cache"):
+        # Mocking the response from the HTTP request
+        mock_response = AsyncMock()
+        # Simulating a response that does not contain the "total" key
+        mock_response.json = lambda: {}
+
+        # Patching the httpx.AsyncClient.get method to return the mock response
+        with patch("src.services.user_service.httpx.AsyncClient.get", return_value=mock_response):
+            # Calling the get_users_count function and checking the result
+            result = await get_users_count()
+            # Asserting that the result is 0 when "total" key is not present
+            assert result == 0  # returns 0 if "total" key is missing
