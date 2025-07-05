@@ -77,3 +77,29 @@ async def test_get_tickets_unexpected_error():
             # Assert that the raised exception has the correct status code and error message
             assert e.value.status_code == 500
             assert "Unexpected error in get_tickets" in e.value.detail
+
+# Test case for get_tickets function with empty response
+@pytest.mark.asyncio
+async def test_get_tickets_empty_response():
+    # Patch cache functions to bypass Redis (simulate cache miss)
+    with patch("src.services.ticket_service.get_cache", return_value=None), \
+         patch("src.services.ticket_service.set_cache"):
+        
+        # Mock empty response for todos API
+        mock_todos_response = AsyncMock()
+        mock_todos_response.json = lambda: {"total": 0, "todos": []}
+
+        # Mock empty response for users API
+        mock_users_response = AsyncMock()
+        mock_users_response.json = lambda: {"total": 0, "users": []}
+
+        # Patch the HTTP GET requests to return the mocked empty responses
+        with patch(
+            "src.services.ticket_service.httpx.AsyncClient.get",
+            side_effect=[mock_todos_response, mock_users_response, mock_todos_response, mock_users_response]
+        ):
+            # Call the function under test
+            tickets = await get_tickets()
+
+        # Assert that the returned tickets list is empty
+        assert len(tickets["tickets"]) == 0
