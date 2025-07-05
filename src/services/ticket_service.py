@@ -82,33 +82,48 @@ async def get_ticket_by_id(ticket_id: int) -> TicketWithRawResponse:
         Returns:
             A TicketWithRawResponse object containing a Ticket object and todo raw dict.
     """
-    async with httpx.AsyncClient() as client:
-        # Fetch the todo item by ID
-        todo_response = await client.get(f"{TICKETS_URL}/{ticket_id}")
-        todo = todo_response.json()
+    try:
+        async with httpx.AsyncClient() as client:
+            # Fetch the todo item by ID
+            info(f"Fetching ticket with ID: {ticket_id}")
+            todo_response = await client.get(f"{TICKETS_URL}/{ticket_id}")
+            todo = todo_response.json()
+
+            # Fetch the user associated with the todo item
+            user_response = await client.get(f"{USERS_URL}/{todo['userId']}")
+            username = user_response.json().get("username", "Unassigned")
+
+            # Map the todo item to a Ticket object
+            status = TicketStatus.closed if todo["completed"] else TicketStatus.open
+            priority = ["low", "medium", "high"][todo["id"] % 3]
+
+            # Create the Ticket object
+            ticket = Ticket(
+                id=todo["id"],
+                title=todo["todo"],
+                status=status,
+                priority=priority,
+                assignee=username
+            )
+
+            # Create the TicketWithRawResponse object
+            ticket_with_raw_response = TicketWithRawResponse(
+                ticket=ticket,
+                raw=todo
+            )
+            info(f"Successfully fetched ticket {ticket_id}")
+            
+            return ticket_with_raw_response
         
-        # Fetch the user associated with the todo item
-        user_response = await client.get(f"{USERS_URL}/{todo['userId']}")
-        username = user_response.json().get("username", "Unassigned")
-        
-        # Map the todo item to a Ticket object
-        status = TicketStatus.closed if todo["completed"] else TicketStatus.open
-        priority = ["low", "medium", "high"][todo["id"] % 3]
-        
-        # Create the Ticket object
-        ticket = Ticket(
-            id=todo["id"],
-            title=todo["todo"],
-            status=status,
-            priority=priority,
-            assignee=username
-        )
-        
-        # Create the TicketWithRawResponse object
-        ticket_with_raw_response = TicketWithRawResponse(
-            ticket=ticket,
-            raw=todo
-        )
-        
-        return ticket_with_raw_response
-          
+    except httpx.HTTPStatusError as e:
+        # Log the HTTP error and raise an HTTPException
+        if e.response.status_code == 404:
+            log_and_raise(f"Ticket with ID {ticket_id} not found", status_code=404)
+        else:
+            log_and_raise(f"HTTP error while fetching ticket by ID {ticket_id}: {e}", 
+                      status_code=e.response.status_code)
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e 
+        # Log any unexpected errors and raise an HTTPException
+        log_and_raise(f"Unexpected error in get_ticket_by_id: {e}")
