@@ -96,3 +96,49 @@ async def test_login_invalid_crendentials():
 
     # Assert that the response status code is 400 (bad request) for invalid credentials
     assert response.status_code == 400
+
+# Test case for login with incomplete data: missing password
+@pytest.mark.asyncio
+async def test_login_with_incomplete_data_password(mock_authenticate_user):
+    # Send incomplete login data (e.g., missing password)
+    login_data = {
+        "username": "testuser",  # 'password' is missing
+    }
+
+    # Simulate a POST request to the /auth/login endpoint with the incomplete data
+    response = client.post("/auth/login", json=login_data)
+
+    # Test will fail as 'token_type' is expected in the response, but it's missing due to incomplete data
+    assert response.status_code == 422  # Expected error due to invalid request (422 Unprocessable Entity)
+
+    # Check the response content, it should be an error response due to missing data
+    data = response.json()
+
+    # Assert that the error is contained within the 'detail' field
+    assert "detail" in data
+
+    # Check that the 'password' is marked as missing in the 'loc' field
+    assert ["body", "password"] == data["detail"][0]["loc"]
+
+# Test case for login with incomplete data: missing username
+@pytest.mark.asyncio
+async def test_login_with_incomplete_data_username(mock_authenticate_user):
+    # Send incomplete login data (e.g., missing username)
+    login_data = {
+        "password": "testpassword",  # 'username' is missing
+    }
+
+    # Simulate a POST request to the /auth/login endpoint with the incomplete data
+    response = client.post("/auth/login", json=login_data)
+
+    # Test will fail as 'token_type' is expected in the response, but it's missing due to incomplete data
+    assert response.status_code == 422  # Expected error due to invalid request (422 Unprocessable Entity)
+
+    # Check the response content, it should be an error response due to missing data
+    data = response.json()
+
+    # Assert that the error is contained within the 'detail' field
+    assert "detail" in data
+
+    # Check that the 'username' is marked as missing in the 'loc' field
+    assert ["body", "username"] == data["detail"][0]["loc"]
