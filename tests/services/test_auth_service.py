@@ -30,3 +30,28 @@ async def test_authenticate_user_success():
         assert result["access_token"] == "valid_access_token"
         assert result["refresh_token"] == "valid_refresh_token"
         assert result["username"] == "valid_user"
+
+
+# Test case for authentication response missing the access token
+@pytest.mark.asyncio
+async def test_authenticate_user_missing_access_token():
+    # Create a mock HTTP response that is missing the access token
+    mock_response = AsyncMock()
+    mock_response.status_code = 200
+    mock_response.json = lambda: {
+        "refreshToken": "valid_refresh_token",
+        "username": "valid_user"
+    }
+
+    # Prepare login request data
+    login_data = LoginRequest(username="valid_user", password="valid_password")
+
+    # Patch the HTTP POST request to return the mock response
+    with patch("src.services.auth_service.httpx.AsyncClient.post", return_value=mock_response):
+        # Expect an HTTPException to be raised due to missing access token
+        with pytest.raises(HTTPException) as e:
+            await authenticate_user(login_data)
+
+        # Verify that the correct exception is raised with appropriate status and message
+        assert e.value.status_code == 500
+        assert "Token not found in response" in e.value.detail
