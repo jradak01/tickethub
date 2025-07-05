@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query, Request
 from typing import Optional
-from src.services.ticket_service import get_tickets
+from src.services.ticket_service import get_tickets, get_ticket_by_id
 from src.models.ticket_model import (Ticket, TicketSummary, 
                                      TicketListResponse, TicketWithRawResponse, 
                                      TicketStatus, TicketPriority)
@@ -66,3 +66,13 @@ async def search_tickets(
     # Filter tickets by title containing the search query (case insensitive)
     filtered = [t for t in tickets["tickets"] if q.lower() in t.title.lower()]
     return filtered
+
+# Endpoint to get a specific ticket by ID
+@router.get("/tickets/{ticket_id}", response_model=TicketWithRawResponse)
+async def get_ticket(
+    request: Request,
+    ticket_id: int):
+    # Fetch ticket from the service
+    ticket = await get_ticket_by_id(ticket_id)
+
+    return ticket
