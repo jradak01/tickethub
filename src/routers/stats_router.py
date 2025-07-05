@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from src.services.ticket_service import get_tickets
 from src.services.user_service import get_users_count
 from src.models.ticket_model import TicketStatus, TicketPriority, Ticket
 from collections import defaultdict
 from statistics import mean
+from src.utils.exceptions import log_and_raise
 
 # Router for statistic endpoints
 router = APIRouter()
@@ -12,9 +13,14 @@ router = APIRouter()
 @router.get("/stats")
 async def get_stats():
     # Fetch all tickets and user count
-    tickets_data = await get_tickets()
-    num_users = await get_users_count()
-        
+    try: 
+        tickets_data = await get_tickets()
+        num_users = await get_users_count()
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        log_and_raise(f"Unexpected error in get_stats: {e}", status_code=500)
+
     # Count total tickets 
     tickets = tickets_data["tickets"]
     total_tickets = tickets_data["total_tickets"]
