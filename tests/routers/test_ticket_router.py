@@ -200,3 +200,56 @@ async def test_search_tickets(mock_get_tickets):
     
     # Check that the title of the returned ticket matches the expected value
     assert response_json[0]["title"] == "Ticket to the moon"
+
+
+# Testing the /tickets route to ensure it correctly filters tickets based on the provided query parameters
+@pytest.mark.asyncio
+async def test_search_tickets_with_filters(mock_get_tickets):
+    # Mock the response for get_tickets to return a list of Ticket objects with different statuses and priorities
+    mock_get_tickets.return_value = {"tickets":[
+            Ticket(
+                id=1,
+                title="Ticket 1",
+                status="open",
+                priority="medium",
+                assignee="user1"
+            ),
+            Ticket(
+                id=2,
+                title="Ticket 2",
+                status="closed",
+                priority="high",
+                assignee="user2"
+            ),
+            Ticket(
+                id=3,
+                title="Ticket 3",
+                status="open",
+                priority="low",
+                assignee="user3"
+            )
+        ],
+        "total_tickets": 3
+    }
+
+    # Create a TestClient instance to simulate requests to the app
+    client = TestClient(app)
+
+    # Send a GET request to /tickets with filters for status "open" and priority "medium"
+    response = client.get("/tickets", params={"status": "open", "priority": "medium"})
+
+    # Check the status and the number of filtered responses
+    assert response.status_code == 200
+    assert len(response.json()["tickets"]) == 1
+    assert response.json()["tickets"][0]["id"] == 1
+    assert response.json()["tickets"][0]["status"] == "open"
+    assert response.json()["tickets"][0]["priority"] == "medium"
+
+    # Filter by status "closed"
+    response = client.get("/tickets", params={"status": "closed"})
+    
+    # Check the status for the "closed" ticket
+    assert response.status_code == 200
+    assert len(response.json()["tickets"]) == 1
+    assert response.json()["tickets"][0]["id"] == 2
+    assert response.json()["tickets"][0]["status"] == "closed"
