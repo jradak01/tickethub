@@ -18,6 +18,19 @@ def mock_get_ticket_by_id(mocker):
     # Return the mock to be used in test cases
     return mock
 
+# Fixture to mock the get_tickets function in the src.routers.tickets module
+@pytest.fixture
+def mock_get_tickets(mocker):
+    # Create a mock object for the get_tickets function
+    mock = AsyncMock()
+    
+    # Use patching to replace the original get_tickets function with the mock
+    mocker.patch('src.routers.ticket_router.get_tickets', mock)
+    
+    # Return the mocked object so it can be used in tests
+    return mock
+
+
 # Test case for the /tickets/{id} route (valid ticket retrieval)
 @pytest.mark.asyncio
 async def test_get_ticket_valid(mock_get_ticket_by_id):
@@ -63,3 +76,19 @@ async def test_get_ticket_valid(mock_get_ticket_by_id):
             "userId": 152
         }
     }
+
+# Test case for the /tickets/{id} route (ticket not found scenario)
+@pytest.mark.asyncio
+async def test_get_ticket_not_found(mock_get_ticket_by_id):
+    # Mock the case where get_ticket_by_id raises an exception (ticket not found)
+    mock_get_ticket_by_id.side_effect = Exception("Ticket not found")
+
+    # Create TestClient instance (used for testing FastAPI routes)
+    client = TestClient(app)
+    
+    # Send GET request to /tickets/9999 route (a non-existent ticket)
+    response = client.get("/tickets/9999")
+
+    # Check if the status code of the response is 500 (internal server error)
+    assert response.status_code == 500
+
