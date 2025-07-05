@@ -6,6 +6,11 @@ from src.models.ticket_model import (Ticket, TicketSummary,
                                      TicketStatus, TicketPriority)
 from src.utils.logger import info, warning, error
 from src.utils.exceptions import log_and_raise
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+
+limiter= Limiter(key_func=get_remote_address)
 
 # Router for ticket-related endpoints
 router = APIRouter()
@@ -13,7 +18,9 @@ router = APIRouter()
 
 # Endpoint to get all tickets
 @router.get("/tickets", response_model=TicketListResponse)
+@limiter.limit("10/minute") 
 async def get_all_tickets(
+    request: Request,
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     status: Optional[TicketStatus] = Query(None),
@@ -63,6 +70,7 @@ async def get_all_tickets(
 
 # Endpoint to search tickets by title
 @router.get("/tickets/search", response_model=list[Ticket]) 
+@limiter.limit("20/minute") 
 async def search_tickets(
     request: Request,
     q: str = Query(..., min_length=1)):
@@ -82,6 +90,7 @@ async def search_tickets(
 
 # Endpoint to get a specific ticket by ID
 @router.get("/tickets/{ticket_id}", response_model=TicketWithRawResponse)
+@limiter.limit("20/minute") 
 async def get_ticket(
     request: Request,
     ticket_id: int):

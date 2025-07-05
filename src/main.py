@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from src.routers import (ticket_router as tickets, 
                          stats_router as stats,
                          auth_router as auth)
@@ -11,8 +11,16 @@ from src.utils.error_handlers import (
 )
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from slowapi import Limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
+
 
 app = FastAPI()
+
+limiter = Limiter(key_func=get_remote_address)
+
 
 # Add middleware to log request information
 app.add_middleware(RequestInfoMiddleware)
@@ -23,7 +31,8 @@ app.add_exception_handler(Exception, global_exception_handler)
 
 # Root endpoint to check if the API is running
 @app.get("/")
-def root():
+@limiter.limit("50/minute")
+def root(request: Request):
     return {"message": "Hello TicketHub!"}
 
 @app.get("/health/")

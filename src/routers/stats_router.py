@@ -5,13 +5,18 @@ from src.models.ticket_model import TicketStatus, TicketPriority, Ticket
 from collections import defaultdict
 from statistics import mean
 from src.utils.exceptions import log_and_raise
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+limiter= Limiter(key_func=get_remote_address)
 
 # Router for statistic endpoints
 router = APIRouter()
 
 # Endpoint to get statistics about tickets
 @router.get("/stats")
-async def get_stats():
+@limiter.limit("10/minute")
+async def get_stats(request: Request):
     # Fetch all tickets and user count
     try: 
         tickets_data = await get_tickets()
