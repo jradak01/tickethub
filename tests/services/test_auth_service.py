@@ -31,7 +31,6 @@ async def test_authenticate_user_success():
         assert result["refresh_token"] == "valid_refresh_token"
         assert result["username"] == "valid_user"
 
-
 # Test case for authentication response missing the access token
 @pytest.mark.asyncio
 async def test_authenticate_user_missing_access_token():
@@ -55,3 +54,24 @@ async def test_authenticate_user_missing_access_token():
         # Verify that the correct exception is raised with appropriate status and message
         assert e.value.status_code == 500
         assert "Token not found in response" in e.value.detail
+
+# Test case for authentication with invalid credentials
+@pytest.mark.asyncio
+async def test_authenticate_user_invalid_credentials():
+    # Create a mock HTTP response simulating failed authentication (400 Bad Request)
+    mock_response = AsyncMock()
+    mock_response.status_code = 400
+    mock_response.json = lambda: {}
+
+    # Prepare login request data with invalid credentials
+    login_data = LoginRequest(username="invalid_user", password="invalid_password")
+
+    # Patch the HTTP POST request to return the mock error response
+    with patch("src.services.auth_service.httpx.AsyncClient.post", return_value=mock_response):
+        # Expect an HTTPException to be raised due to invalid credentials
+        with pytest.raises(HTTPException) as e:
+            await authenticate_user(login_data)
+
+        # Assert that the exception has correct status code and error message
+        assert e.value.status_code == 400
+        assert "Invalid credentials" in e.value.detail
