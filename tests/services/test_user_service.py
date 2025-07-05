@@ -68,3 +68,23 @@ async def test_get_users_count_invalid_json_format():
                 await get_users_count()
             # Asserting that an HTTPException is raised with the expected message
             assert "Unexpected error" in e.value.detail
+
+# Test cases for get_users_count function when the JSON parsing raises an exception
+@pytest.mark.asyncio
+async def test_get_users_count_json_raises_exception():
+    with patch("src.services.user_service.get_cache", return_value=None), patch("src.services.user_service.set_cache"):
+        # Mocking the response from the HTTP request
+        mock_response = AsyncMock()
+        # Simulating a scenario where JSON parsing raises an exception
+        async def raise_json_error():
+            raise ValueError("Invalid JSON")
+        # Setting the mock response's json method to raise an exception
+        mock_response.json = raise_json_error
+
+        # Patching the httpx.AsyncClient.get method to return the mock response
+        with patch("src.services.user_service.httpx.AsyncClient.get", return_value=mock_response):
+            # Calling the get_users_count function and checking the result
+            with pytest.raises(HTTPException) as e:
+                await get_users_count()
+            # Asserting that an HTTPException is raised with the expected message
+            assert "Unexpected error" in e.value.detail 
