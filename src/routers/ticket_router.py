@@ -52,3 +52,17 @@ async def get_all_tickets(
         page = page,
         page_size = page_size
     )
+
+
+# Endpoint to search tickets by title
+@router.get("/tickets/search", response_model=list[Ticket]) 
+async def search_tickets(
+    request: Request,
+    q: str = Query(..., min_length=1)):
+    
+    # Fetch all tickets from the service
+    tickets = await get_tickets()
+        
+    # Filter tickets by title containing the search query (case insensitive)
+    filtered = [t for t in tickets["tickets"] if q.lower() in t.title.lower()]
+    return filtered
