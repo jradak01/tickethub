@@ -142,3 +142,27 @@ async def test_login_with_incomplete_data_username(mock_authenticate_user):
 
     # Check that the 'username' is marked as missing in the 'loc' field
     assert ["body", "username"] == data["detail"][0]["loc"]
+
+# Test case for login with completely missing data
+@pytest.mark.asyncio
+async def test_login_with_incomplete_data(mock_authenticate_user):
+    # Send incomplete login data (e.g., no username or password)
+    login_data = {
+        # Both 'username' and 'password' are missing
+    }
+
+    # Simulate a POST request to the /auth/login endpoint with the incomplete data
+    response = client.post("/auth/login", json=login_data)
+    
+    # Test will fail because 'token_type' is expected in the response, but it's missing due to the incomplete data
+    assert response.status_code == 422  # Expected error due to invalid request (422 Unprocessable Entity)
+
+    # Check the response content, it should be an error response due to missing data
+    data = response.json()
+
+    # Assert that the error is contained within the 'detail' field
+    assert "detail" in data
+
+    # Check that both 'username' and 'password' are marked as missing in the 'loc' field
+    assert ["body", "username"] == data["detail"][0]["loc"]  # 'username' is missing
+    assert ["body", "password"] == data["detail"][1]["loc"]  # 'password' is missing
