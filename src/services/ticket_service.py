@@ -61,6 +61,13 @@ async def get_tickets() -> list[Ticket]:
 
 # Function to fetch a specific ticket by ID and return it with raw response data
 async def get_ticket_by_id(ticket_id: int) -> TicketWithRawResponse:
+    """
+        Fetches a ticket from an external API and returns a TicketWithRawResponse object.
+        This function retrieves a ticket and its associated user information,
+        mapping user IDs to usernames, and categorizing a ticket by status and priority.
+        Returns:
+            A TicketWithRawResponse object containing a Ticket object and todo raw dict.
+    """
     async with httpx.AsyncClient() as client:
         # Fetch the todo item by ID
         todo_response = await client.get(f"{TICKETS_URL}/{ticket_id}")
