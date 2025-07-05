@@ -2,9 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [*]
+    branches: [solution/josipa_radak]
   pull_request:
-    branches: [*]
+    branches: [solution/josipa_radak]
 
 jobs:
   build-test-lint:
