@@ -21,9 +21,14 @@ app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, global_exception_handler)
 
+# Root endpoint to check if the API is running
 @app.get("/")
 def root():
     return {"message": "Hello TicketHub!"}
+
+@app.get("/health/")
+def liveness_check():
+    return {"status": "ok"}
 
 # Include the tickets router
 app.include_router(tickets.router)
