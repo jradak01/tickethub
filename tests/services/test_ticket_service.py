@@ -161,3 +161,24 @@ async def test_get_ticket_by_id_not_found():
             # Assertions to verify that the correct HTTPException is raised
             assert e.value.status_code == 404
             assert "Ticket with ID 999 not found" in e.value.detail
+
+# Test case for get_ticket_by_id function with unexpected error
+@pytest.mark.asyncio
+async def test_get_ticket_by_id_unexpected_error():
+    # Patch cache functions to simulate no cached data
+    with patch("src.services.ticket_service.get_cache", return_value=None), \
+         patch("src.services.ticket_service.set_cache"):
+
+        # Create a mock response that raises an exception when .json() is called
+        mock_todo_response = AsyncMock()
+        mock_todo_response.json = AsyncMock(side_effect=Exception("Unexpected error"))
+
+        # Patch the HTTP GET request to return the faulty mock response
+        with patch("src.services.ticket_service.httpx.AsyncClient.get", return_value=mock_todo_response):
+            # Expect get_ticket_by_id to raise an HTTPException due to the unexpected error
+            with pytest.raises(HTTPException) as e:
+                await get_ticket_by_id(1)
+
+            # Verify that the raised exception has the correct status code and error message
+            assert e.value.status_code == 500
+            assert "Unexpected error in get_ticket_by_id" in e.value.detail
