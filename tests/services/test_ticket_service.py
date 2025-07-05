@@ -52,3 +52,28 @@ async def test_get_tickets_success():
         assert tickets["tickets"][0].id == 1
         assert tickets["tickets"][0].title == "Some Todo"
         assert tickets["tickets"][0].status == TicketStatus.open
+
+
+# Test case for get_tickets function with no tickets found
+@pytest.mark.asyncio
+async def test_get_tickets_unexpected_error():
+    # Patch cache functions to bypass actual Redis interaction
+    with patch("src.services.ticket_service.get_cache", return_value=None), \
+         patch("src.services.ticket_service.set_cache"):
+        
+        # Create a mock response that raises an HTTPStatusError when raise_for_status is called
+        mock_todos_response = AsyncMock()
+        mock_todos_response.raise_for_status = AsyncMock(
+            side_effect=httpx.HTTPStatusError("500 Internal Server Error", request=None, response=None)
+        )
+        mock_todos_response.json = AsyncMock(return_value={"total": 10})  # This won't be used due to the error
+
+        # Patch the HTTP GET request to return the faulty mock response
+        with patch("src.services.ticket_service.httpx.AsyncClient.get", return_value=mock_todos_response):
+            # Expect the get_tickets function to raise an HTTPException due to the internal error
+            with pytest.raises(HTTPException) as e:
+                await get_tickets()
+
+            # Assert that the raised exception has the correct status code and error message
+            assert e.value.status_code == 500
+            assert "Unexpected error in get_tickets" in e.value.detail
