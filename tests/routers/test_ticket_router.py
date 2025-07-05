@@ -92,3 +92,43 @@ async def test_get_ticket_not_found(mock_get_ticket_by_id):
     # Check if the status code of the response is 500 (internal server error)
     assert response.status_code == 500
 
+@pytest.mark.asyncio
+async def test_get_all_tickets(mock_get_tickets):
+    # Mock the response of the get_tickets function to return a list of ticket data
+    mock_get_tickets.return_value = {"tickets":[
+        Ticket(
+            id= 1,
+            title= "Ticket 1",
+            status= "open",
+            priority= "medium",
+            assignee= "user1"
+        ),Ticket(
+            id= 2,
+            title= "Ticket 2",
+            status= "closed",
+            priority= "high",
+            assignee= "user2"
+        )
+    ],
+    "total_tickets":2
+    }
+
+    # Create a TestClient instance for testing the app
+    client = TestClient(app)
+    
+    # Send a GET request to the /tickets route with query parameters 'limit' and 'skip'
+    response = client.get("/tickets?limit=2&skip=0")
+
+    # Check the response status code to ensure the request was successful
+    assert response.status_code == 200
+    
+    # Verify that the response contains 2 tickets (as specified by 'limit=2')
+    assert len(response.json()["tickets"]) == 2
+    
+    # Check the content of the first ticket in the response
+    assert response.json()["tickets"][0]["id"] == 1
+    
+    # Check the status of the second ticket to ensure it matches the expected value
+    assert response.json()["tickets"][1]["status"] == "closed"
+    
+   
