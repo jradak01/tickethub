@@ -112,6 +112,10 @@ async def get_ticket_by_id(ticket_id: int) -> TicketWithRawResponse:
             # Fetch the todo item by ID
             info(f"Fetching ticket with ID: {ticket_id}")
             todo_response = await client.get(f"{TICKETS_URL}/{ticket_id}")
+            
+            if todo_response.status_code == 404:
+                log_and_raise(f"Ticket with ID {ticket_id} not found", status_code=404)
+
             todo = todo_response.json()
 
             # Fetch the user associated with the todo item

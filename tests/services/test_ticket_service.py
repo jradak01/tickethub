@@ -139,3 +139,25 @@ async def test_get_ticket_by_id_success():
         assert ticket_with_raw.ticket.status == TicketStatus.open
         assert ticket_with_raw.ticket.assignee == "test_user"
         assert ticket_with_raw.raw == mock_todo_response.json()
+
+# Test case for get_ticket_by_id function with ticket not found
+@pytest.mark.asyncio
+async def test_get_ticket_by_id_not_found():
+    # Patch cache-related functions to simulate a cache miss
+    with patch("src.services.ticket_service.get_cache", return_value=None), \
+         patch("src.services.ticket_service.set_cache"):
+
+        # Mock response from the external API to simulate a 404 Not Found
+        mock_todo_response = AsyncMock()
+        mock_todo_response.status_code = 404
+        mock_todo_response.json = AsyncMock(return_value={})
+
+        # Patch AsyncClient.get to return the mocked 404 response
+        with patch("src.services.ticket_service.httpx.AsyncClient.get", return_value=mock_todo_response):
+            # Expect the get_ticket_by_id function to raise an HTTPException
+            with pytest.raises(HTTPException) as e:
+                await get_ticket_by_id(999)
+
+            # Assertions to verify that the correct HTTPException is raised
+            assert e.value.status_code == 404
+            assert "Ticket with ID 999 not found" in e.value.detail
