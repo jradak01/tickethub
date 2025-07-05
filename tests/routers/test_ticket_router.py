@@ -159,3 +159,44 @@ async def test_get_all_tickets_no_filter(mock_get_tickets):
     
     # Check the ID of the returned ticket to ensure it matches the expected value
     assert response.json()["tickets"][0]["id"] == 1
+
+# Testing the /tickets/search route to ensure it correctly filters tickets based on the search query parameter
+@pytest.mark.asyncio
+async def test_search_tickets(mock_get_tickets):
+    # Mock the response for get_tickets to return a list of Ticket objects with different titles
+    mock_get_tickets.return_value = {"tickets":[
+        Ticket(
+            id=1,
+            title="Do something nice for someone",
+            status="open",
+            priority="medium",
+            assignee="paisleyf"
+        ),
+        Ticket(
+            id=2,
+            title="Ticket to the moon",
+            status="closed",
+            priority="high",
+            assignee="moonwalker"
+        )
+    ],
+    "total_tickets": 2}
+
+    # Create a TestClient instance to simulate requests to the app
+    client = TestClient(app)
+    
+    # Send a GET request to the /tickets/search route with a query parameter 'q=moon'
+    response = client.get("/tickets/search?q=moon")
+    response_json = response.json()
+
+    # Print the full response for debugging purposes (can be removed later)
+    print(response_json)
+
+    # Check the response status code to ensure the request was successful
+    assert response.status_code == 200
+    
+    # Verify that the response contains exactly one ticket that matches the search query
+    assert len(response_json) == 1
+    
+    # Check that the title of the returned ticket matches the expected value
+    assert response_json[0]["title"] == "Ticket to the moon"
