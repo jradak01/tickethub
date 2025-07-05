@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # FastAPI servis
+  tickethub:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+    networks:
+      - tickethub_network
+  test:
+    build: .
+    depends_on:
+      - redis
+    command: pytest tests/
+    environment:
+      REDIS_HOST: redis
+  # Redis servis
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    networks:
+      - tickethub_network
+
+networks:
+  tickethub_network:
+    driver: bridge

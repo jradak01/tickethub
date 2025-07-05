@@ -3,7 +3,7 @@ import json
 
 def get_redis_connection():
     """Connect to the Redis server."""
-    return redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
+    return redis.StrictRedis(host='redis', port=6379, db=0, decode_responses=True)
 
 def set_cache(key, value, ttl=None):
     """Store data in Redis."""
