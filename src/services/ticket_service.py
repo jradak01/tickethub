@@ -1,5 +1,5 @@
 import httpx
-from src.models.ticket import Ticket, TicketStatus, TicketPriority, TicketWithRawResponse
+from src.models.ticket_model import Ticket, TicketStatus, TicketPriority, TicketWithRawResponse
 from fastapi import HTTPException
 from src.config import TICKETS_URL, USERS_URL
 

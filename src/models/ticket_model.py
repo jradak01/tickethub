@@ -13,6 +13,13 @@ class TicketPriority(str, Enum):
     medium = "medium"
     high = "high"
 
+# TicketSummary model - defines the structure of a summary of a ticket
+class TicketSummary(BaseModel):
+    id: int
+    title: str
+    status: TicketStatus
+    priority: TicketPriority
+
 # Ticket model - defines the structure of a ticket object
 class Ticket(BaseModel):
     id: int
@@ -25,3 +32,8 @@ class Ticket(BaseModel):
 class TicketWithRawResponse(BaseModel):
     ticket: Ticket
     raw: dict[str, Any]
+
+# TicketListResponse model - defines the structure of a response containing a list of tickets
+class TicketListResponse(BaseModel):
+    tickets: list[TicketSummary]
+    total_tickets: int
