@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from enum import Enum
-from typing import Any
+from typing import Any, List
 
 # Ticket status enum - limits allowed values to "open" or "closed"
 class TicketStatus(str, Enum):
@@ -35,5 +35,7 @@ class TicketWithRawResponse(BaseModel):
 
 # TicketListResponse model - defines the structure of a response containing a list of tickets
 class TicketListResponse(BaseModel):
-    tickets: list[TicketSummary]
+    tickets: List[TicketSummary]
     total_tickets: int
+    page: int
+    page_size: int
