@@ -131,4 +131,31 @@ async def test_get_all_tickets(mock_get_tickets):
     # Check the status of the second ticket to ensure it matches the expected value
     assert response.json()["tickets"][1]["status"] == "closed"
     
-   
+@pytest.mark.asyncio
+async def test_get_all_tickets_no_filter(mock_get_tickets):
+    # Mock the response for the get_tickets function to return a list of tickets with no filters applied
+    mock_get_tickets.return_value = {"tickets":[
+        Ticket(
+            id=1,
+            title="Ticket 1",
+            status="open",
+            priority="medium",
+            assignee="user1"
+        )],
+        "total_tickerts": 1
+        }
+
+    # Create a TestClient instance to simulate requests to the app
+    client = TestClient(app)
+    
+    # Send a GET request to the /tickets route without any filters (e.g., no limit or skip)
+    response = client.get("/tickets")
+
+    # Check the response status code to ensure the request was successful
+    assert response.status_code == 200
+    
+    # Verify that the response contains exactly one ticket
+    assert len(response.json()["tickets"]) == 1
+    
+    # Check the ID of the returned ticket to ensure it matches the expected value
+    assert response.json()["tickets"][0]["id"] == 1
