@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import AsyncMock, patch
 from src.services.user_service import get_users_count
 from fastapi import HTTPException
+from httpx import HTTPStatusError, Response, Request
 
 # Test cases for get_users_count function in user_service
 @pytest.mark.asyncio
@@ -88,3 +89,25 @@ async def test_get_users_count_json_raises_exception():
                 await get_users_count()
             # Asserting that an HTTPException is raised with the expected message
             assert "Unexpected error" in e.value.detail 
+
+# Test cases for get_users_count function when HTTPStatusError is raised
+@pytest.mark.asyncio
+async def test_get_users_count_http_status_error():
+    with patch("src.services.user_service.get_cache", return_value=None), patch("src.services.user_service.set_cache"):
+        # Mocking the response from the HTTP request
+        mock_response = AsyncMock()
+        # Simulating an HTTPStatusError with a 500 status code
+        exc = HTTPStatusError("Error", request=Request("GET", "url"), response=Response(500))
+
+        # Defining a function to raise the HTTPStatusError
+        async def raise_error(*args, **kwargs):
+            raise exc
+    
+        # Patching the httpx.AsyncClient.get method to raise the HTTPStatusError
+        with patch("src.services.user_service.httpx.AsyncClient.get", side_effect=raise_error):
+            # Calling the get_users_count function and checking the result
+            with pytest.raises(HTTPException) as e:
+                await get_users_count()
+            # Asserting that an HTTPException is raised with the expected status code and message
+            assert e.value.status_code == 500
+            assert "HTTP error" in e.value.detail
