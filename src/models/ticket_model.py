@@ -37,5 +37,5 @@ class TicketWithRawResponse(BaseModel):
 class TicketListResponse(BaseModel):
     tickets: List[TicketSummary]
     total_tickets: int
-    page: int
-    page_size: int
+    skip: int
+    limit: int

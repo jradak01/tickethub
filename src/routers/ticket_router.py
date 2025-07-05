@@ -21,8 +21,8 @@ router = APIRouter()
 @limiter.limit("10/minute") 
 async def get_all_tickets(
     request: Request,
-    page: int = Query(1, ge=1),
-    page_size: int = Query(10, ge=1, le=100),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=100),
     status: Optional[TicketStatus] = Query(None),
     priority: Optional[TicketPriority] = Query(None)
 ):
@@ -36,8 +36,8 @@ async def get_all_tickets(
     tickets = ticket_data["tickets"]
     
     # Calculate pagination parameters
-    start = (page - 1) * page_size
-    end = start + page_size
+    start = (skip - 1) * skip
+    end = start + limit
     
     # Filter tickets by status and priority if provided
     if status:
@@ -63,8 +63,8 @@ async def get_all_tickets(
     return TicketListResponse(
         total_tickets=len(tickets),
         tickets=summaries,
-        page = page,
-        page_size = page_size
+        skip = skip,
+        limit = limit
     )
 
 
