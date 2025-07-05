@@ -75,3 +75,24 @@ async def test_authenticate_user_invalid_credentials():
         # Assert that the exception has correct status code and error message
         assert e.value.status_code == 400
         assert "Invalid credentials" in e.value.detail
+
+# Test case for authentication when the external server returns a 500 Internal Server Error
+@pytest.mark.asyncio
+async def test_authenticate_user_server_error():
+    # Create a mock HTTP response simulating a server error (500 Internal Server Error)
+    mock_response = AsyncMock()
+    mock_response.status_code = 500
+    mock_response.json = lambda: {}
+
+    # Prepare login request data with valid credentials
+    login_data = LoginRequest(username="valid_user", password="valid_password")
+
+    # Patch the HTTP POST request to return the mock server error response
+    with patch("src.services.auth_service.httpx.AsyncClient.post", return_value=mock_response):
+        # Expect an HTTPException to be raised due to the server error
+        with pytest.raises(HTTPException) as e:
+            await authenticate_user(login_data)
+
+        # Assert that the exception has correct status code and error message
+        assert e.value.status_code == 500
+        assert "Server error" in e.value.detail
