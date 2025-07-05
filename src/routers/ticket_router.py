@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Query, Request, HTTPException
 from typing import Optional
 from src.services.ticket_service import get_tickets, get_ticket_by_id
 from src.models.ticket_model import (Ticket, TicketSummary, 
                                      TicketListResponse, TicketWithRawResponse, 
                                      TicketStatus, TicketPriority)
+from src.utils.logger import info, warning, error
+from src.utils.exceptions import log_and_raise
 
 # Router for ticket-related endpoints
 router = APIRouter()
@@ -18,7 +20,12 @@ async def get_all_tickets(
     priority: Optional[TicketPriority] = Query(None)
 ):
     # Fetch tickets from the service
-    ticket_data = await get_tickets()
+    try:
+        ticket_data = await get_tickets()
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        log_and_raise(f"Unexpected error in get_all_tickets: {e}", status_code=500)
     tickets = ticket_data["tickets"]
     
     # Calculate pagination parameters
@@ -61,7 +68,13 @@ async def search_tickets(
     q: str = Query(..., min_length=1)):
     
     # Fetch all tickets from the service
-    tickets = await get_tickets()
+    try:
+        tickets = await get_tickets()
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        log_and_raise(f"Unexpected error in search_tickets: {e}", status_code=500)
+        error("Unexpected error in search_tickets:", str(e))
         
     # Filter tickets by title containing the search query (case insensitive)
     filtered = [t for t in tickets["tickets"] if q.lower() in t.title.lower()]
@@ -73,6 +86,12 @@ async def get_ticket(
     request: Request,
     ticket_id: int):
     # Fetch ticket from the service
-    ticket = await get_ticket_by_id(ticket_id)
+    try:
+        ticket = await get_ticket_by_id(ticket_id)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        log_and_raise(f"Unexpected error in get_ticket: {e}", status_code=500)
+        error("Unexpected error in get_ticket:", str(e))
 
     return ticket
