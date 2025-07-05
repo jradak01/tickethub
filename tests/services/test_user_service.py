@@ -111,3 +111,20 @@ async def test_get_users_count_http_status_error():
             # Asserting that an HTTPException is raised with the expected status code and message
             assert e.value.status_code == 500
             assert "HTTP error" in e.value.detail
+
+# Test cases for get_users_count function when an unexpected error occurs
+@pytest.mark.asyncio
+async def test_get_users_count_unexpected_error():
+    with patch("src.services.user_service.get_cache", return_value=None), patch("src.services.user_service.set_cache"):
+        # Mocking the response from the HTTP request
+        async def raise_unexpected(*args, **kwargs):
+            raise RuntimeError("Unexpected failure")
+    
+        # Patching the httpx.AsyncClient.get method to raise an unexpected error
+        with patch("src.services.user_service.httpx.AsyncClient.get", side_effect=raise_unexpected):
+            # Calling the get_users_count function and checking the result
+            with pytest.raises(HTTPException) as e:
+                await get_users_count()
+            # Asserting that an HTTPException is raised with the expected status code and message
+            assert e.value.status_code == 500
+            assert "Unexpected error" in e.value.detail
