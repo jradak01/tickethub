@@ -103,3 +103,39 @@ async def test_get_tickets_empty_response():
 
         # Assert that the returned tickets list is empty
         assert len(tickets["tickets"]) == 0
+
+
+# Test case for get_ticket_by_id function with successful response
+@pytest.mark.asyncio
+async def test_get_ticket_by_id_success():
+    # Patch cache-related functions to simulate a cache miss
+    with patch("src.services.ticket_service.get_cache", return_value=None), \
+         patch("src.services.ticket_service.set_cache"):
+        
+        # Mock response for the todo (ticket) API
+        mock_todo_response = AsyncMock()
+        mock_todo_response.json = lambda: {
+            "id": 1,
+            "todo": "Some Todo",
+            "completed": False,
+            "userId": 1
+        }
+
+        # Mock response for the user API
+        mock_user_response = AsyncMock()
+        mock_user_response.json = lambda: {"username": "test_user"}
+
+        # Patch AsyncClient.get to return the mocked responses for the todo and user
+        with patch(
+            "src.services.ticket_service.httpx.AsyncClient.get",
+            side_effect=[mock_todo_response, mock_user_response]
+        ):
+            # Call the function under test
+            ticket_with_raw = await get_ticket_by_id(1)
+
+        # Assertions to validate the returned ticket data
+        assert ticket_with_raw.ticket.id == 1
+        assert ticket_with_raw.ticket.title == "Some Todo"
+        assert ticket_with_raw.ticket.status == TicketStatus.open
+        assert ticket_with_raw.ticket.assignee == "test_user"
+        assert ticket_with_raw.raw == mock_todo_response.json()
