@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import AsyncMock
 from fastapi.testclient import TestClient
-from src.main import app 
-from src.models.ticket_model import (TicketStatus, TicketPriority, 
+from main import app 
+from models.ticket_model import (TicketStatus, TicketPriority, 
                                      Ticket, TicketSummary, 
                                      TicketListResponse, TicketWithRawResponse)
 
@@ -12,20 +12,20 @@ def mock_get_ticket_by_id(mocker):
     # Create an AsyncMock to simulate the behavior of 'get_ticket_by_id'
     mock = AsyncMock()
 
-    # Patch the 'get_ticket_by_id' function in 'src.routers.ticket_router' with the mock
-    mocker.patch('src.routers.ticket_router.get_ticket_by_id', mock)
+    # Patch the 'get_ticket_by_id' function in 'routers.ticket_router' with the mock
+    mocker.patch('routers.ticket_router.get_ticket_by_id', mock)
 
     # Return the mock to be used in test cases
     return mock
 
-# Fixture to mock the get_tickets function in the src.routers.tickets module
+# Fixture to mock the get_tickets function in the routers.tickets module
 @pytest.fixture
 def mock_get_tickets(mocker):
     # Create a mock object for the get_tickets function
     mock = AsyncMock()
     
     # Use patching to replace the original get_tickets function with the mock
-    mocker.patch('src.routers.ticket_router.get_tickets', mock)
+    mocker.patch('routers.ticket_router.get_tickets', mock)
     
     # Return the mocked object so it can be used in tests
     return mock

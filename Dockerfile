@@ -5,7 +5,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Set the Python path to the working directory
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app/src
 
 # Copy requirements.txt into the container
 COPY requirements.txt .
