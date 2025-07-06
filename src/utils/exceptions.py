@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from src.utils.logger import error
 
+
 def log_and_raise(msg: str, status_code: int = 500) -> None:
     # Log the error message using the custom logger
     error(msg)

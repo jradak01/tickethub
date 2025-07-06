@@ -3,6 +3,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 from src.utils.logger import info, warning
 
+
 # Middleware to log request information
 class RequestInfoMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -14,7 +15,7 @@ class RequestInfoMiddleware(BaseHTTPMiddleware):
             body = await request.body()
             info("Body:", body.decode() if body else "No body")
         except Exception:
-        # If body is not available, log a warning
+            # If body is not available, log a warning
             info("Body: not available")
         info("---")
         response = await call_next(request)

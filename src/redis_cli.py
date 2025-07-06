@@ -1,9 +1,11 @@
 import redis
 import json
 
+
 def get_redis_connection():
     """Connect to the Redis server."""
-    return redis.StrictRedis(host='redis', port=6379, db=0, decode_responses=True)
+    return redis.StrictRedis(host="redis", port=6379, db=0, decode_responses=True)
+
 
 def set_cache(key, value, ttl=None):
     """Store data in Redis."""
@@ -14,6 +16,7 @@ def set_cache(key, value, ttl=None):
     else:
         r.set(key, json.dumps(value))  # Store without TTL
 
+
 def get_cache(key):
     """Retrieve data from Redis."""
     r = get_redis_connection()
@@ -22,10 +25,12 @@ def get_cache(key):
         return json.loads(cached_data)  # Return parsed JSON data
     return None  # Return None if no data is found
 
+
 def delete_cache(key):
     """Delete data from Redis."""
     r = get_redis_connection()
     r.delete(key)
+
 
 def cache_exists(key):
     """Check if a key exists in Redis."""

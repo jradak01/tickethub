@@ -1,6 +1,7 @@
 import pytest
 from src.utils.logger import info, warning, error
 
+
 # Test logging of INFO level message
 def test_info_logging(caplog):
     # Enable capturing logs at INFO level
@@ -9,6 +10,7 @@ def test_info_logging(caplog):
     # Check that the message appears in the captured logs
     assert "Test info message" in caplog.text
 
+
 # Test logging of WARNING level message
 def test_warning_logging(caplog):
     # Enable capturing logs at WARNING level
@@ -16,6 +18,7 @@ def test_warning_logging(caplog):
         warning("Test warning message")  # Log a WARNING message
     # Check that the message appears in the captured logs
     assert "Test warning message" in caplog.text
+
 
 # Test logging of ERROR level message
 def test_error_logging(caplog):
