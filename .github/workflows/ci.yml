@@ -26,15 +26,23 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Add `src` to PYTHONPATH globally
+        run: |
+          echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install flake8 pytest
 
+      # Debugging step - List all files in the repository to ensure src exists
+      - name: Debugging step - List files in the repository
+        run: ls -R
+
       - name: Run tests (pytest)
         run: |
-          PYTHONPATH=$(pwd)/src pytest tests/  # Set PYTHONPATH just for the pytest command
+          pytest tests/  # Now it should automatically use the PYTHONPATH set globally
 
       - name: PEP-8 lint check (flake8)
         run: |
