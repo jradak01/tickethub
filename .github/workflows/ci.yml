@@ -21,13 +21,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Add src to PYTHONPATH
-        run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
-      
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+
+      - name: Add src to PYTHONPATH
+        run: |
+          echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
+          echo "PYTHONPATH=$PYTHONPATH" 
 
       - name: Install dependencies
         run: |
@@ -36,7 +38,9 @@ jobs:
           pip install flake8 pytest
 
       - name: Run tests (pytest)
-        run: pytest tests/
+        run: |
+          export PYTHONPATH=$(pwd)/src  
+          pytest tests/
 
       - name: PEP-8 lint check (flake8)
         run: |
