@@ -32,15 +32,9 @@ jobs:
           pip install -r requirements.txt
           pip install flake8 pytest
 
-      - name: Set PYTHONPATH for tests
-        run: |
-          echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
-          echo "PYTHONPATH=$PYTHONPATH"  # Ensure PYTHONPATH is set properly
-
       - name: Run tests (pytest)
         run: |
-          export PYTHONPATH=$(pwd)/src  # Explicitly set PYTHONPATH before running pytest
-          pytest tests/  # Run tests with pytest
+          PYTHONPATH=$(pwd)/src pytest tests/  # Set PYTHONPATH just for the pytest command
 
       - name: PEP-8 lint check (flake8)
         run: |
