@@ -38,13 +38,14 @@ jobs:
 
       - name: Debugging step - List files in the repository
         run: ls -R
+
       - name: Debugging step - Check PYTHONPATH
         run: echo $PYTHONPATH
 
       - name: Run tests (pytest)
         run: |
-        pytest --maxfail=5 --disable-warnings -v  # start tests
-        working-directory: ${{ github.workspace }}  
+          pytest --maxfail=5 --disable-warnings -v  # start tests
+        working-directory: ${{ github.workspace }}
 
       - name: PEP-8 lint check (flake8)
         run: |
