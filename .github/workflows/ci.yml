@@ -18,94 +18,49 @@ jobs:
         options: --health-cmd="redis-cli ping" --health-interval=5s --health-timeout=3s --health-retries=5
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Set up Python 3.11
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install flake8 pytest
 
+      # Step 4: Debugging step - List files in the repository
       - name: Debugging step - List files in the repository
         run: ls -R
 
+      # Step 5: Debugging step - Check PYTHONPATH
       - name: Debugging step - Check PYTHONPATH
         run: echo $PYTHONPATH
 
+      # Step 6: PEP-8 lint check (flake8)
       - name: PEP-8 lint check (flake8)
         run: |
           flake8 src/ --max-line-length=100 --exclude=__init__.py
 
-        name: CI Pipeline
-
-on:
-  push:
-    branches: [solution/josipa_radak]
-  pull_request:
-    branches: [solution/josipa_radak]
-
-jobs:
-  build-test-lint:
-    runs-on: ubuntu-latest
-
-    services:
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
-        options: --health-cmd="redis-cli ping" --health-interval=5s --health-timeout=3s --health-retries=5
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install flake8 pytest
-
-      - name: Debugging step - List files in the repository
-        run: ls -R
-
-      - name: Debugging step - Check PYTHONPATH
-        run: echo $PYTHONPATH
-
-      - name: PEP-8 lint check (flake8)
-        run: |
-          flake8 src/ --max-line-length=100 --exclude=__init__.py
-
+      # Step 7: Install Docker Compose (only once)
       - name: Install Docker Compose
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      # Step 8: Set PYTHONPATH and run tests with pytest
       - name: Set PYTHONPATH and run tests with pytest
         run: |
           export PYTHONPATH=$(pwd)/src
           echo "PYTHONPATH: $PYTHONPATH"
           pytest tests/ --maxfail=1 --disable-warnings -q --tb=short
 
-      
-      - name: Build Docker image (check if Dockerfile works)
-        run: docker-compose build
-
-
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
+      # Step 9: Build Docker image (check if Dockerfile works)
       - name: Build Docker image (check if Dockerfile works)
         run: docker-compose build
