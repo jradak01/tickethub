@@ -42,5 +42,10 @@ jobs:
         run: |
           flake8 src/ --max-line-length=100 --exclude=__init__.py
 
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
       - name: Build Docker image (check if Dockerfile works)
         run: docker-compose build
