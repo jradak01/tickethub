@@ -25,7 +25,6 @@ async def get_tickets() -> list[Ticket]:
     if cached_tickets:
         info("Returning cached tickets")
         tickets = [Ticket(**ticket) for ticket in cached_tickets]
-        total_tickets = len(tickets)
         return {"tickets": tickets, "total_tickets": len(tickets)}
     try:
         async with httpx.AsyncClient() as client:

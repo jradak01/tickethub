@@ -6,7 +6,7 @@ from src.services.auth_service import authenticate_user
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-## try on: /docs#/ route --> { "username": "emilys", "password": "emilyspass"}
+# try on: /docs#/ route --> { "username": "emilys", "password": "emilyspass"}
 @router.post("/login", response_model=LoginResponse)
 async def login(login_data: LoginRequest):
     # Authenticate user with provided login data

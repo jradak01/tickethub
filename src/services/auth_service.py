@@ -34,13 +34,13 @@ async def authenticate_user(login_data):
             # Raise exception for any other unsuccessful HTTP status codes
             response.raise_for_status()
 
-        except httpx.HTTPStatusError as e:
+        except httpx.HTTPStatusError:
             # Handle unexpected HTTP errors from the authentication server
             raise HTTPException(
                 status_code=500, detail="Unexpected authentication error"
             )
 
-        except httpx.RequestError as e:
+        except httpx.RequestError:
             # Handle network-related errors such as connection problems
             raise HTTPException(
                 status_code=503, detail="Authentication service unavailable"
