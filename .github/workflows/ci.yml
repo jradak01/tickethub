@@ -44,8 +44,10 @@ jobs:
 
       - name: Run tests (pytest)
         run: |
-          pytest --maxfail=5 --disable-warnings -v  # start tests
+          export PYTHONPATH=$(pwd)/src
+          pytest --maxfail=5 --disable-warnings -v
         working-directory: ${{ github.workspace }}
+
 
       - name: PEP-8 lint check (flake8)
         run: |
