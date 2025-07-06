@@ -44,7 +44,7 @@ jobs:
 
       - name: Run tests (pytest)
         run: |
-          export PYTHONPATH=$(pwd)/tickethub/src
+          export PYTHONPATH=$(pwd)/tickethub/
           pytest --maxfail=5 --disable-warnings -v
         working-directory: ${{ github.workspace }}
 

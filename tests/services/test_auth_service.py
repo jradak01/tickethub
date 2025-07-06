@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import AsyncMock, patch
 from fastapi import HTTPException
-from services.auth_service import authenticate_user
-from models.auth_model import LoginRequest
+from src.services.auth_service import authenticate_user
+from src.models.auth_model import LoginRequest
 import httpx
 
 
@@ -22,7 +22,7 @@ async def test_authenticate_user_success():
     login_data = LoginRequest(username="valid_user", password="valid_password")
 
     # Patch the HTTP POST request to the auth service to return the mock response
-    with patch("services.auth_service.httpx.AsyncClient.post", return_value=mock_response):
+    with patch("src.services.auth_service.httpx.AsyncClient.post", return_value=mock_response):
         # Call the function under test
         result = await authenticate_user(login_data)
 
@@ -46,7 +46,7 @@ async def test_authenticate_user_missing_access_token():
     login_data = LoginRequest(username="valid_user", password="valid_password")
 
     # Patch the HTTP POST request to return the mock response
-    with patch("services.auth_service.httpx.AsyncClient.post", return_value=mock_response):
+    with patch("src.services.auth_service.httpx.AsyncClient.post", return_value=mock_response):
         # Expect an HTTPException to be raised due to missing access token
         with pytest.raises(HTTPException) as e:
             await authenticate_user(login_data)
@@ -67,7 +67,7 @@ async def test_authenticate_user_invalid_credentials():
     login_data = LoginRequest(username="invalid_user", password="invalid_password")
 
     # Patch the HTTP POST request to return the mock error response
-    with patch("services.auth_service.httpx.AsyncClient.post", return_value=mock_response):
+    with patch("src.services.auth_service.httpx.AsyncClient.post", return_value=mock_response):
         # Expect an HTTPException to be raised due to invalid credentials
         with pytest.raises(HTTPException) as e:
             await authenticate_user(login_data)
@@ -88,7 +88,7 @@ async def test_authenticate_user_server_error():
     login_data = LoginRequest(username="valid_user", password="valid_password")
 
     # Patch the HTTP POST request to return the mock server error response
-    with patch("services.auth_service.httpx.AsyncClient.post", return_value=mock_response):
+    with patch("src.services.auth_service.httpx.AsyncClient.post", return_value=mock_response):
         # Expect an HTTPException to be raised due to the server error
         with pytest.raises(HTTPException) as e:
             await authenticate_user(login_data)

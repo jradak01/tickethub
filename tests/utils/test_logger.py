@@ -1,5 +1,5 @@
 import pytest
-from utils.logger import info, warning, error
+from src.utils.logger import info, warning, error
 
 # Test logging of INFO level message
 def test_info_logging(caplog):
