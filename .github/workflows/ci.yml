@@ -39,6 +39,8 @@ jobs:
       # Debugging step - List all files in the repository to ensure src exists
       - name: Debugging step - List files in the repository
         run: ls -R
+      - name: Debugging step - Check PYTHONPATH
+        run: echo $PYTHONPATH
 
       - name: Run tests (pytest)
         run: |
