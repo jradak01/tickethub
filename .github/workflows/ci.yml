@@ -21,6 +21,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Add src to PYTHONPATH
+        run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
+      
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
