@@ -36,7 +36,6 @@ jobs:
           pip install -r requirements.txt
           pip install flake8 pytest
 
-      # Debugging step - List all files in the repository to ensure src exists
       - name: Debugging step - List files in the repository
         run: ls -R
       - name: Debugging step - Check PYTHONPATH
@@ -44,7 +43,8 @@ jobs:
 
       - name: Run tests (pytest)
         run: |
-          pytest tests/  # Now it should automatically use the PYTHONPATH set globally
+        pytest --maxfail=5 --disable-warnings -v  # start tests
+        working-directory: ${{ github.workspace }}  
 
       - name: PEP-8 lint check (flake8)
         run: |
