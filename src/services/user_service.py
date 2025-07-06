@@ -1,9 +1,8 @@
 import httpx
-from fastapi import HTTPException
 from src.config import USERS_URL, CACHE_TTL, CACHE_KEY_USERS
-from src.utils.logger import info, warning, error
+from src.utils.logger import info
 from src.utils.exceptions import log_and_raise
-from src.redis_cli import get_cache, set_cache, cache_exists
+from src.redis_cli import get_cache, set_cache
 
 
 # Function to fetch a total number of users

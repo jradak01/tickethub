@@ -1,9 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import AsyncMock
 from src.main import app
-from src.models.auth_model import LoginRequest, LoginResponse
-from src.services.auth_service import authenticate_user
+from src.models.auth_model import LoginResponse
 
 # Create a TestClient instance for interacting with the FastAPI app
 client = TestClient(app)

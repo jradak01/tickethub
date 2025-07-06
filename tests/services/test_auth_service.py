@@ -3,8 +3,6 @@ from unittest.mock import AsyncMock, patch
 from fastapi import HTTPException
 from src.services.auth_service import authenticate_user
 from src.models.auth_model import LoginRequest
-import httpx
-
 
 # Test case for successful user authentication
 @pytest.mark.asyncio

@@ -9,7 +9,7 @@ from src.models.ticket_model import (
     TicketStatus,
     TicketPriority,
 )
-from src.utils.logger import info, warning, error
+from src.utils.logger import error
 from src.utils.exceptions import log_and_raise
 from slowapi import Limiter
 from slowapi.util import get_remote_address

@@ -8,8 +8,8 @@ from src.models.ticket_model import (
 from fastapi import HTTPException
 from src.config import TICKETS_URL, USERS_URL, CACHE_KEY_TICKETS, CACHE_TTL
 from src.utils.exceptions import log_and_raise
-from src.utils.logger import info, warning, error
-from src.redis_cli import get_cache, set_cache, cache_exists
+from src.utils.logger import info
+from src.redis_cli import get_cache, set_cache
 
 
 # Function to fetch tickets from the ecternal API

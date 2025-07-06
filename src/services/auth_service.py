@@ -1,6 +1,5 @@
 import httpx
 from fastapi import HTTPException
-from src.models.auth_model import LoginRequest
 from src.config import AUTH_URL
 
 

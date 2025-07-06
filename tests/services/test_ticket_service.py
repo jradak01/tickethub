@@ -1,13 +1,8 @@
 import pytest
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, patch
 from src.services.ticket_service import get_tickets, get_ticket_by_id
 from fastapi import HTTPException
-from src.models.ticket_model import (
-    Ticket,
-    TicketStatus,
-    TicketPriority,
-    TicketWithRawResponse,
-)
+from src.models.ticket_model import TicketStatus
 import httpx
 
 

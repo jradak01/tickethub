@@ -2,15 +2,7 @@ import pytest
 from unittest.mock import AsyncMock
 from fastapi.testclient import TestClient
 from src.main import app
-from src.models.ticket_model import (
-    TicketStatus,
-    TicketPriority,
-    Ticket,
-    TicketSummary,
-    TicketListResponse,
-    TicketWithRawResponse,
-)
-
+from src.models.ticket_model import Ticket
 
 # Fixture to mock the 'get_ticket_by_id' function in the ticket_router
 @pytest.fixture

@@ -1,7 +1,6 @@
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
-from src.utils.logger import info, warning
+from src.utils.logger import info
 
 
 # Middleware to log request information

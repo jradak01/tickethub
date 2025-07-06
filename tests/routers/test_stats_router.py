@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import AsyncMock
 from src.main import app
 from src.models.ticket_model import (
     TicketStatus,

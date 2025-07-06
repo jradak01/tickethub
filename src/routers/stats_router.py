@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, HTTPException
 from src.services.ticket_service import get_tickets
 from src.services.user_service import get_users_count
-from src.models.ticket_model import TicketStatus, TicketPriority, Ticket
+from src.models.ticket_model import TicketStatus, TicketPriority
 from collections import defaultdict
 from statistics import mean
 from src.utils.exceptions import log_and_raise
