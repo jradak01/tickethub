@@ -54,13 +54,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      # Step 8: Set PYTHONPATH and run tests with pytest
       - name: Set PYTHONPATH and run tests with pytest
         run: |
           export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
-          echo "PYTHONPATH: $PYTHONPATH"
-          pytest tests/ --maxfail=1 --disable-warnings -q --tb=short
+          python -m pytest tests/ --maxfail=1 --disable-warnings -q --tb=short
         env:
-          PYTHONPATH: ${{ github.workspace }}/src
+          PYTHONPATH: ./src
+
 
       # Step 9: Build Docker image (check if Dockerfile works)
       - name: Build Docker image (check if Dockerfile works)
